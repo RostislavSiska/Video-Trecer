@@ -1,19 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+"Роутер для авторизации"
 from datetime import timedelta
-from app.database import get_db
-from app.models import User
-from app.schemas.auth import UserCreate, UserOut, Token, LoginForm
-from app.core.security import get_password_hash, verify_password, create_access_token, get_current_user
-from app.core.config import settings
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import timedelta
+from app.schemas.auth import UserCreate, UserOut, Token
 from app.database import get_db
 from app.models import User
-from app.schemas.auth import Token  # или свою схему
-from app.core.security import verify_password, create_access_token
+from app.core.security import get_password_hash, verify_password, \
+    create_access_token, get_current_user
 from app.core.config import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -30,10 +24,10 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Пользователь с таким username или email уже существует"
         )
-    
+
     # Хешируем пароль
     hashed = get_password_hash(user_data.password)
-    
+
     # Создаём пользователя
     new_user = User(
         username=user_data.username,

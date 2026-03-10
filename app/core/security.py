@@ -1,13 +1,14 @@
+"Безопасность"
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from app.core.config import settings
+from app.models import User
+from app.database import get_db
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -37,7 +38,7 @@ def decode_token(token: str) -> Optional[dict]:
         return payload
     except JWTError:
         return None
-    
+
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
@@ -73,6 +74,7 @@ def get_optional_user(
     token: Optional[str] = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ) -> Optional[User]:
+    "Получить авторизованного пользователя"
     if not token:
         return None
     payload = decode_token(token)
